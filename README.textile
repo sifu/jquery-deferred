@@ -14,3 +14,7 @@ and wrapper functions for jQuery's ajax functions:
 * jQuery.d_post( )
 
 more documentation to come...
+
+h2. TODO
+* port the tests
+* documentation
