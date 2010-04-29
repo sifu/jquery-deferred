@@ -1,11 +1,11 @@
-h1. A port of dojo's Deferred and DeferredList to jQuery
+h1. A port of dojo's Deferred/Promise System to jQuery
 
 provides:
 
 * jQuery.Deferred( )
 * jQuery.DeferredList( )
 
-and wrapper function for jQuery's ajax functions:
+and wrapper functions for jQuery's ajax functions:
 
 * jQuery.d_ajax( )
 * jQuery.d_get( )
