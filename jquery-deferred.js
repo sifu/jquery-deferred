@@ -360,4 +360,43 @@ by: Siegmund Führinger - http://sifu.io/ - http://twitter.com/0xx0
         }
         return callback(promiseOrValue);
     };
+
+    jQuery.d_ajax = function( options ) {
+        var d = new jQuery.Deferred( );
+        var args = options || {};
+        args.success = function( data ) {
+            return d.callback( data );
+        };
+        args.error = function( XMLHttpRequest, textStatus, errorThrown ) {
+            d.errback( errorThrown || textStatus );
+        };
+        jQuery.ajax( args );
+        return d;
+    };
+
+    jQuery.d_get = function( url, data, type ) {
+        return jQuery.d_ajax( {
+            type: 'GET',
+            url: url,
+            data: data,
+            dataType: type
+        } );
+    };
+
+    jQuery.d_getScript = function( url ) {
+        return jQuery.d_get( url, null, 'script' );
+    };
+
+    jQuery.d_getJSON = function( url, data ) {
+        return jQuery.d_get( url, data, 'json' );
+    };
+
+    jQuery.d_post = function( url, data, type ) {
+        return jQuery.d_ajax( {
+            type: 'POST',
+            url: url,
+            data: data,
+            dataType: type
+        } );
+    };
 })();

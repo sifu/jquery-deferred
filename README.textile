@@ -5,4 +5,12 @@ provides:
 * jQuery.Deferred( )
 * jQuery.DeferredList( )
 
+and wrapper function for jQuery's ajax functions:
+
+* jQuery.d_ajax( )
+* jQuery.d_get( )
+* jQuery.d_getScript( )
+* jQuery.d_getJSON( )
+* jQuery.d_post( )
+
 more documentation to come...
