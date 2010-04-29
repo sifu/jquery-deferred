@@ -1,15 +1,52 @@
-dojo.provide("dojo._base.Deferred");
+/*
+The "New" BSD License:
+**********************
+
+Copyright (c) 2005-2009, The Dojo Foundation
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+  * Neither the name of the Dojo Foundation nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/*
+this is direct port of Dojo's Deferred to jQuery, with some wrapper functions 
+for jQuery's ajax functions
+
+by: Siegmund Führinger - http://sifu.io/ - http://twitter.com/0xx0
+*/
+
 
 (function(){
 	var mutator = function(){};		
 	var freeze = Object.freeze || function(){};
 	// A deferred provides an API for creating and resolving a promise.
-	dojo.Deferred = function(/*Function?*/canceller){
+	jQuery.Deferred = function(/*Function?*/canceller){
 	// summary:
 	//		Deferreds provide a generic means for encapsulating an asynchronous
 	// 		operation and notifying users of the completion and result of the operation. 
 	// description:
-	//		The dojo.Deferred API is based on the concept of promises that provide a
+	//		The jQuery.Deferred API is based on the concept of promises that provide a
 	//		generic interface into the eventual completion of an asynchronous action.
 	//		The motivation for promises fundamentally is about creating a 
 	//		separation of concerns that allows one to achieve the same type of 
@@ -23,10 +60,10 @@ dojo.provide("dojo._base.Deferred");
 	//		separated from the concerns of asynchronous interaction (which are 
 	//		handled by the promise).
 	// 
-	//  	The dojo.Deferred is a type of promise that provides methods for fulfilling the 
+	//  	The jQuery.Deferred is a type of promise that provides methods for fulfilling the 
 	// 		promise with a successful result or an error. The most important method for 
-	// 		working with Dojo's promises is the then() method, which follows the 
-	// 		CommonJS proposed promise API. An example of using a Dojo promise:
+	// 		working with jQuery's promises is the then() method, which follows the 
+	// 		CommonJS proposed promise API. An example of using a jQuery promise:
 	//		
 	//		| 	var resultingPromise = someAsyncOperation.then(function(result){
 	//		|		... handle result ...
@@ -38,7 +75,7 @@ dojo.provide("dojo._base.Deferred");
 	//		The .then() call returns a new promise that represents the result of the 
 	// 		execution of the callback. The callbacks will never affect the original promises value.
 	//
-	//		The dojo.Deferred instances also provide the following functions for backwards compatibility:
+	//		The jQuery.Deferred instances also provide the following functions for backwards compatibility:
 	//
 	//			* addCallback(handler)
 	//			* addErrback(handler)
@@ -56,7 +93,7 @@ dojo.provide("dojo._base.Deferred");
 	//		another kind of error), so the errbacks should be prepared to
 	//		handle that error for cancellable Deferreds.
 	// example:
-	//	|	var deferred = new dojo.Deferred();
+	//	|	var deferred = new jQuery.Deferred();
 	//	|	setTimeout(function(){ deferred.callback({success: true}); }, 1000);
 	//	|	return deferred;
 	// example:
@@ -99,7 +136,7 @@ dojo.provide("dojo._base.Deferred");
 	//
 	//		|	// Deferred style:
 	//		|	function renderLotsOfData(data){
-	//		|		var d = new dojo.Deferred();
+	//		|		var d = new jQuery.Deferred();
 	//		|		try{
 	//		|			for(var x in data){
 	//		|				renderDataitem(data[x]);
@@ -125,7 +162,7 @@ dojo.provide("dojo._base.Deferred");
 	//
 	//		|	// Deferred style and async func
 	//		|	function renderLotsOfData(data){
-	//		|		var d = new dojo.Deferred();
+	//		|		var d = new jQuery.Deferred();
 	//		|		setTimeout(function(){
 	//		|			try{
 	//		|				for(var x in data){
@@ -206,7 +243,7 @@ dojo.provide("dojo._base.Deferred");
 			this.fired = 1;
 			complete(error);
 			if(!error || error.log !== false){
-				(dojo.config.deferredOnError || function(x){ console.error(x); })(error);
+				(function(x){ console.error(x); })(error);
 			}
 		};
 		// call progress to provide updates on the progress on the completion of the promise
@@ -248,7 +285,7 @@ dojo.provide("dojo._base.Deferred");
 			//		|		then(printResult, onError);
   			//		|	>44 
 			// 		
-			var returnDeferred = progressCallback == mutator ? this : new dojo.Deferred(promise.cancel);
+			var returnDeferred = progressCallback == mutator ? this : new jQuery.Deferred(promise.cancel);
 			var listener = {
 				resolved: resolvedCallback, 
 				error: errorCallback, 
@@ -279,49 +316,48 @@ dojo.provide("dojo._base.Deferred");
 				reject(error);
 			}
 		}
+
+        this.addCallback = function(/*Function*/callback) {
+            return this.addCallbacks(callback);
+        };
+		this.addErrback = function (/*Function*/errback) {
+			return this.addCallbacks(null, errback);
+		};
+		this.addBoth = function (/*Function*/callback) {
+			return this.addCallbacks(callback, callback);
+		};
+
+		this.fired = -1;
+
 		freeze(promise);
 	};
-	dojo.extend(dojo.Deferred, {
-		addCallback: function (/*Function*/callback) {
-			return this.addCallbacks(dojo.hitch.apply(dojo, arguments));
-		},
-	
-		addErrback: function (/*Function*/errback) {
-			return this.addCallbacks(null, dojo.hitch.apply(dojo, arguments));
-		},
-	
-		addBoth: function (/*Function*/callback) {
-			var enclosed = dojo.hitch.apply(dojo, arguments);
-			return this.addCallbacks(enclosed, enclosed);
-		},
-		fired: -1
-	});
+
+    jQuery.when = function(promiseOrValue, /*Function?*/callback, /*Function?*/errback, /*Function?*/progressHandler){
+        // summary:
+        //		This provides normalization between normal synchronous values and 
+        //		asynchronous promises, so you can interact with them in a common way
+        //	example:
+        //		|	function printFirstAndList(items){
+        //		|		jQuery.when(findFirst(items), console.log);
+        //		|		jQuery.when(findLast(items), console.log);
+        //		|	}
+        //		|	function findFirst(items){
+        //		|		return jQuery.when(items, function(items){
+        //		|			return items[0];
+        //		|		});
+        //		|	}
+        //		|	function findLast(items){
+        //		|		return jQuery.when(items, function(items){
+        //		|			return items[items.length];
+        //		|		});
+        //		|	}
+        //		And now all three of his functions can be used sync or async.
+        //		|	printFirstAndLast([1,2,3,4]) will work just as well as
+        //		|	printFirstAndLast(jQuery.xhrGet(...));
+        
+        if(promiseOrValue && typeof promiseOrValue.then === "function"){
+            return promiseOrValue.then(callback, errback, progressHandler);
+        }
+        return callback(promiseOrValue);
+    };
 })();
-dojo.when = function(promiseOrValue, /*Function?*/callback, /*Function?*/errback, /*Function?*/progressHandler){
-	// summary:
-	//		This provides normalization between normal synchronous values and 
-	//		asynchronous promises, so you can interact with them in a common way
-	//	example:
-	//		|	function printFirstAndList(items){
-	//		|		dojo.when(findFirst(items), console.log);
-	//		|		dojo.when(findLast(items), console.log);
-	//		|	}
-	//		|	function findFirst(items){
-	//		|		return dojo.when(items, function(items){
-	//		|			return items[0];
-	//		|		});
-	//		|	}
-	//		|	function findLast(items){
-	//		|		return dojo.when(items, function(items){
-	//		|			return items[items.length];
-	//		|		});
-	//		|	}
-	//		And now all three of his functions can be used sync or async.
-	//		|	printFirstAndLast([1,2,3,4]) will work just as well as
-	//		|	printFirstAndLast(dojo.xhrGet(...));
-	
-	if(promiseOrValue && typeof promiseOrValue.then === "function"){
-		return promiseOrValue.then(callback, errback, progressHandler);
-	}
-	return callback(promiseOrValue);
-};

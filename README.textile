@@ -1,0 +1,8 @@
+h1. A port of dojo's Deferred and DeferredList to jQuery
+
+provides:
+
+* jQuery.Deferred( )
+* jQuery.DeferredList( )
+
+more documentation to come...
