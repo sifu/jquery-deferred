@@ -1,4 +1,4 @@
-h1. A port of dojo's Deferred/Promise system to jQuery
+h1. A port of Dojo's Deferred/Promise system to jQuery
 
 provides:
 
