@@ -343,7 +343,7 @@ by: Siegmund Führinger - http://sifu.io/ - http://twitter.com/0xx0
             return d.callback( data );
         };
         args.error = function( XMLHttpRequest, textStatus, errorThrown ) {
-            d.errback( errorThrown || textStatus );
+            d.errback( XMLHttpRequest );
         };
         jQuery.ajax( args );
         return d;
