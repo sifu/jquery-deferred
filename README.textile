@@ -1,7 +1,7 @@
 h1. A port of Dojo's Deferred/Promise system to jQuery
 
 It is based on the development version of Dojo which will become 1.5. See:
-http://www.sitepen.com/blog/2010/05/03/robust-promises-with-dojo-deferred-1-5/
+"Robust Promises with dojo.Deferred 1.5":http://www.sitepen.com/blog/2010/05/03/robust-promises-with-dojo-deferred-1-5/
 for changes to the original dojo.Deferreds.
 
 provides:
