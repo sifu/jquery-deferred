@@ -201,7 +201,7 @@ by: Siegmund Führinger - http://sifu.io/ - http://twitter.com/0xx0
 			}	
 		}
 		// calling resolve will resolve the promise
-		var resolve = this.resolve = this.callback = function(value){
+		this.resolve = this.callback = function(value){
 			// summary:
 			//		Fulfills the Deferred instance successfully with the provide value
 			this.fired = 0;
@@ -211,12 +211,13 @@ by: Siegmund Führinger - http://sifu.io/ - http://twitter.com/0xx0
 		
 		
 		// calling error will indicate that the promise failed
-		var reject = this.reject = this.errback = function(error){
+		this.reject = this.errback = function(error){
 			// summary:
 			//		Fulfills the Deferred instance as an error with the provided error 
 			isError = true;
 			this.fired = 1;
 			complete(error);
+			this.results = [null, error];
 			if(!error || error.log !== false){
 				(function(x){ console.error(x); })(error);
 			}
@@ -278,20 +279,21 @@ by: Siegmund Führinger - http://sifu.io/ - http://twitter.com/0xx0
 			}
 			return returnDeferred.promise;
 		};
-		
+		var deferred = this;
 		this.cancel = promise.cancel = function () {
 			// summary:
 			//		Cancels the asynchronous operation
 			if(!finished){
-				var error = canceller && canceller(this);
-				if (!(error instanceof Error)) {
-					error = new Error(error);
+				var error = canceller && canceller(deferred);
+				if(!finished){
+					if (!(error instanceof Error)) {
+						error = new Error(error);
+					}
+					error.log = false;
+					deferred.reject(error);
 				}
-				error.log = false;
-				reject(error);
 			}
-		}
-
+		};
         this.addCallback = function(/*Function*/callback) {
             return this.addCallbacks(callback);
         };
