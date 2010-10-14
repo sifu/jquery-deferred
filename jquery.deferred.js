@@ -345,7 +345,11 @@ by: Siegmund Führinger - http://sifu.io/ - http://twitter.com/0xx0
             return d.callback( data );
         };
         args.error = function( XMLHttpRequest, textStatus, errorThrown ) {
-            d.errback( XMLHttpRequest );
+            d.errback( {
+                XMLHttpRequest: XMLHttpRequest,
+                textStatus: textStatus,
+                errorThrown: errorThrown
+            } );
         };
         jQuery.ajax( args );
         return d;
